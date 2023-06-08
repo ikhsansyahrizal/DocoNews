@@ -1,5 +1,6 @@
 package com.docotel.ikhsansyahrizal.doconewss.ui
 
+import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,8 +15,16 @@ import com.squareup.picasso.Picasso
 
 class NewsAdapter(): RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
 
-    private var items: List<ArticlesItem> = emptyList()
-    private var listener: AdapterView.OnItemClickListener? = null
+    private val articles: MutableList<ArticlesItem> = mutableListOf()
+    private lateinit var context: Context
+    private lateinit var clickListener: OnItemClickListener
+
+    interface OnItemClickListener {
+        fun onItemClick(article: ArticlesItem)
+    }
+    fun setOnItemClickListener(listener: OnItemClickListener) {
+        clickListener = listener
+    }
 
     private val differ = AsyncListDiffer(this, DIFFUTIL_ARTICLEITEM_CALLBACK)
 
@@ -31,7 +40,9 @@ class NewsAdapter(): RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
                 .load(data.urlToImage)
                 .into(binding.imgNews)
 
-            Log.d("chech data on adapter", data.source.name)
+            binding.root.setOnClickListener {
+                clickListener.onItemClick(data)
+            }
         }
 
     }
@@ -64,8 +75,8 @@ class NewsAdapter(): RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
         differ.submitList(list)
     }
 
-    fun setItemClickListener(listener: AdapterView.OnItemClickListener) {
-        this.listener = listener
-    }
+//    fun setItemClickListener(listener: AdapterView.OnItemClickListener) {
+//        this.listener = listener
+//    }
 
 }

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
@@ -73,6 +74,16 @@ class MainActivity : AppCompatActivity() {
             binding.swipeRefreshLayout.isRefreshing = false
         }
 
+        newsAdapter.setOnItemClickListener(object : NewsAdapter.OnItemClickListener {
+            override fun onItemClick(article: ArticlesItem) {
+                val intent = Intent(this@MainActivity, DetailActivity::class.java).apply {
+                    val bundle = Bundle()
+                    bundle.putParcelable("ARTICLE_KEY", article)
+                    putExtras(bundle)
+                }
+                startActivity(intent)
+            }
+        })
 
     }
 
@@ -111,6 +122,17 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.bookmarks -> {
+                // Perform bookmark action
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+
     private fun observeLoading() {
         viewModel.isLoading.observe(this) { isLoading ->
             if (isLoading) {
@@ -131,5 +153,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
 
 }
