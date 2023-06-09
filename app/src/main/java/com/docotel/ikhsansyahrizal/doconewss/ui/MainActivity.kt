@@ -3,13 +3,11 @@ package com.docotel.ikhsansyahrizal.doconewss.ui
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.docotel.ikhsansyahrizal.doconewss.R
 import com.docotel.ikhsansyahrizal.doconewss.databinding.ActivityMainBinding
@@ -125,7 +123,8 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.bookmarks -> {
-                // Perform bookmark action
+                val intent = Intent(this, BookmarkActivity::class.java)
+                startActivity(intent)
                 true
             }
             else -> super.onOptionsItemSelected(item)

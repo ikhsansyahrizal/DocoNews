@@ -6,4 +6,7 @@
     <string name="title">Title</string>
     <string name="search">Search</string>
     <string name="bookmars">Bookmars</string>
+    <string name="all_saved_data_cleared">All saved data cleared</string>
+    <string name="detail_news">Detail News</string>
+    <string name="saved_news">Saved News</string>
 </resources>

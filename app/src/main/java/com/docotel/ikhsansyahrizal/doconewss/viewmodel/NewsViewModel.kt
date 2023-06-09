@@ -11,9 +11,10 @@ import com.docotel.ikhsansyahrizal.doconewss.networking.retrofit.ApiService
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class NewsViewModel : ViewModel() {
+class NewsViewModel() : ViewModel() {
 
     private val apiService = ApiService
+
     private var isLastPage = false
     var isLoading = MutableLiveData<Boolean>()
     var errorLimit = MutableLiveData<Boolean>()
@@ -27,7 +28,7 @@ class NewsViewModel : ViewModel() {
             viewModelScope.launch {
 
                 try {
-                    delay(1000)
+                    delay(500)
                     val response = if (query.isNullOrEmpty()) {
                         apiService.getNews(
                             "us",

@@ -13,22 +13,22 @@ import com.docotel.ikhsansyahrizal.doconewss.helper.DIFFUTIL_ARTICLEITEM_CALLBAC
 import com.docotel.ikhsansyahrizal.first.networking.res.ArticlesItem
 import com.squareup.picasso.Picasso
 
-class NewsAdapter(): RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
+class NewsAdapter() : RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
 
-    private val articles: MutableList<ArticlesItem> = mutableListOf()
-    private lateinit var context: Context
     private lateinit var clickListener: OnItemClickListener
 
     interface OnItemClickListener {
         fun onItemClick(article: ArticlesItem)
     }
+
     fun setOnItemClickListener(listener: OnItemClickListener) {
         clickListener = listener
     }
 
     private val differ = AsyncListDiffer(this, DIFFUTIL_ARTICLEITEM_CALLBACK)
 
-    inner class NewsViewHolder(private val binding: NewsItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class NewsViewHolder(private val binding: NewsItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
         fun bind(data: ArticlesItem) {
             binding.tvTitle.text = data.title ?: ""
@@ -55,28 +55,17 @@ class NewsAdapter(): RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
 
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
         val currentItem = differ.currentList[position]
-        holder.bind(
-            currentItem
-        )
+        holder.bind(currentItem)
 
-//        holder.itemView.setOnClickListener {
-//            val context = holder.itemView.context
-//            val intent = Intent(context, DetailActivity::class.java)
-//            intent.putExtra(DetailActivity.EXTRA_NEWS_ITEM, currentItem)
-//            context.startActivity(intent)
-//        }
     }
 
     override fun getItemCount(): Int {
         return differ.currentList.size
     }
 
-    fun setList(list: List<ArticlesItem>){
+    fun setList(list: List<ArticlesItem>) {
         differ.submitList(list)
     }
 
-//    fun setItemClickListener(listener: AdapterView.OnItemClickListener) {
-//        this.listener = listener
-//    }
 
 }

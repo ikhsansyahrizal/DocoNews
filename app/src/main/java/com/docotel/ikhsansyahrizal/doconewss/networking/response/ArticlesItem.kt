@@ -29,5 +29,6 @@ data class ArticlesItem(
 	val publishedAt: String?,
 
 	@field:SerializedName("content")
-	val content: String?
+	val content: String?,
+
 ) : Parcelable
