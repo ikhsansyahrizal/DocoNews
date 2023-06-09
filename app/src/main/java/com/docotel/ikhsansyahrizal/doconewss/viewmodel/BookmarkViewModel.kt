@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.docotel.ikhsansyahrizal.doconewss.Bookmark.BookmarkManager
 import com.docotel.ikhsansyahrizal.first.networking.res.ArticlesItem
 
-class BookmarkViewModel(private val context: Context): ViewModel() {
+class BookmarkViewModel(context: Context): ViewModel() {
 
     private val bookmarkManager: BookmarkManager = BookmarkManager(context)
 

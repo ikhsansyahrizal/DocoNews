@@ -12,7 +12,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
-import com.docotel.ikhsansyahrizal.doconewss.Bookmark.BookmarkManager
 import com.docotel.ikhsansyahrizal.doconewss.R
 import com.docotel.ikhsansyahrizal.doconewss.databinding.ActivityDetailBinding
 import com.docotel.ikhsansyahrizal.doconewss.viewmodel.DetailViewModel
@@ -23,10 +22,9 @@ import com.squareup.picasso.Picasso
 class DetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDetailBinding
-    private lateinit var viewmodel: DetailViewModel
+    private lateinit var viewModel: DetailViewModel
     private var isBookmarked: Boolean = false
 
-    private lateinit var bookmarkManager: BookmarkManager
     private lateinit var articlesItem: ArticlesItem
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,7 +35,7 @@ class DetailActivity : AppCompatActivity() {
         setSupportActionBar(binding.myToolbarDetail)
 
         val viewmodelFactory = DetailViewModelFactory(applicationContext)
-        viewmodel = ViewModelProvider(this, viewmodelFactory)[DetailViewModel::class.java]
+        viewModel = ViewModelProvider(this, viewmodelFactory)[DetailViewModel::class.java]
 
         val article = intent.getParcelableExtra<ArticlesItem?>("ARTICLE_KEY")
         articlesItem = intent.getParcelableExtra("ARTICLE_KEY")!!
@@ -96,16 +94,16 @@ class DetailActivity : AppCompatActivity() {
 
     private fun toogledBookmark() {
         if (isBookmarked) {
-            viewmodel.removeBookmark(articlesItem)
+            viewModel.removeBookmark(articlesItem)
         } else {
-            viewmodel.addBookmark(articlesItem)
+            viewModel.addBookmark(articlesItem)
         }
         isBookmarked = !isBookmarked
     }
 
     private fun updateBookmarkIcon(articlesItem: ArticlesItem) {
         val bookmarkIcon = binding.myToolbarDetail.menu.findItem(R.id.add_bookmark)
-        val listArticle = viewmodel.getBookmarkedArticles()
+        val listArticle = viewModel.getBookmarkedArticles()
         if (listArticle.contains(articlesItem)) {
             isBookmarked = true
             bookmarkIcon?.setIcon(R.drawable.baseline_bookmark_added_24)

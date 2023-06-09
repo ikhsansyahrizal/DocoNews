@@ -38,7 +38,7 @@ class NewsViewModel() : ViewModel() {
                             NetworkAttribute.apiKey
                         )
                     } else {
-                        apiService.SearchNews(
+                        apiService.searchNews(
                             query,
                             currentPage,
                             NetworkAttribute.totalItem,

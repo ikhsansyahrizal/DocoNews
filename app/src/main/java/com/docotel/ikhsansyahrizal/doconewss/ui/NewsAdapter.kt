@@ -1,11 +1,8 @@
 package com.docotel.ikhsansyahrizal.doconewss.ui
 
-import android.content.Context
-import android.content.Intent
-import android.util.Log
+
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.AdapterView
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import com.docotel.ikhsansyahrizal.doconewss.databinding.NewsItemBinding
@@ -13,7 +10,7 @@ import com.docotel.ikhsansyahrizal.doconewss.helper.DIFFUTIL_ARTICLEITEM_CALLBAC
 import com.docotel.ikhsansyahrizal.first.networking.res.ArticlesItem
 import com.squareup.picasso.Picasso
 
-class NewsAdapter() : RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
+class NewsAdapter : RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
 
     private lateinit var clickListener: OnItemClickListener
 

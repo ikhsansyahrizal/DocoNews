@@ -1,6 +1,5 @@
 package com.docotel.ikhsansyahrizal.doconewss.networking.retrofit
 
-import com.docotel.ikhsansyahrizal.first.networking.res.ArticlesItem
 import com.docotel.ikhsansyahrizal.first.networking.response.NewsApiResponse
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -30,12 +29,8 @@ object ApiService {
         return newsApi.getNews(country, query, page, pageSize, apiKey)
     }
 
-    suspend fun SearchNews(query: String, page: Int, pageSize: Int, apiKey: String) : Response<NewsApiResponse> {
+    suspend fun searchNews(query: String, page: Int, pageSize: Int, apiKey: String) : Response<NewsApiResponse> {
         return newsApi.searchNews(query, page, pageSize, apiKey)
-    }
-
-    suspend fun getStatus(country: String, apiKey: String) : NewsApiResponse {
-        return newsApi.getStatus(country, apiKey)
     }
 
 }
@@ -58,12 +53,6 @@ interface NewsApiService {
         @Query("pageSize") pageSize: Int,
         @Query("apiKey") apiKey: String
     ) : Response<NewsApiResponse>
-
-    @GET("top-headlines")
-    suspend fun getStatus(
-        @Query("country") country: String,
-        @Query("apiKey") apiKey: String
-    ): NewsApiResponse
 
 }
 
