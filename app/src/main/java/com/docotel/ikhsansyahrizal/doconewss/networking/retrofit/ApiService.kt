@@ -1,5 +1,6 @@
 package com.docotel.ikhsansyahrizal.doconewss.networking.retrofit
 
+import com.docotel.ikhsansyahrizal.doconewss.helper.NetworkAttribute
 import com.docotel.ikhsansyahrizal.first.networking.response.NewsApiResponse
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -10,15 +11,14 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 object ApiService {
-    private const val BASE_URL = "https://newsapi.org/v2/"
 
-    val loggingInterceptor =HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
-    val client =OkHttpClient.Builder()
+    private val loggingInterceptor =HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+    private val client =OkHttpClient.Builder()
         .addInterceptor(loggingInterceptor)
         .build()
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
+        .baseUrl(NetworkAttribute.BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .client(client)
         .build()
@@ -36,7 +36,7 @@ object ApiService {
 }
 
 interface NewsApiService {
-    @GET("top-headlines")
+    @GET(NetworkAttribute.TOP_HEADLINE)
     suspend fun getNews(
         @Query("country") country: String,
         @Query("q") query: String,
@@ -46,7 +46,7 @@ interface NewsApiService {
     ): Response<NewsApiResponse>
 
 
-    @GET("everything")
+    @GET(NetworkAttribute.EVERYTHING)
     suspend fun searchNews(
         @Query("q") query: String,
         @Query("page") page: Int,
@@ -55,5 +55,3 @@ interface NewsApiService {
     ) : Response<NewsApiResponse>
 
 }
-
-class ApiException(message: String) : Exception(message)

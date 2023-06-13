@@ -9,4 +9,8 @@
     <string name="all_saved_data_cleared">All saved data cleared</string>
     <string name="detail_news">Detail News</string>
     <string name="saved_news">Saved News</string>
+    <string name="desc">Desc</string>
+    <string name="date">Date News</string>
+    <string name="news_photo">News photo</string>
+    <string name="error">error</string>
 </resources>

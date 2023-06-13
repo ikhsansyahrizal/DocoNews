@@ -12,15 +12,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.docotel.ikhsansyahrizal.doconewss.R
 import com.docotel.ikhsansyahrizal.doconewss.databinding.ActivityMainBinding
 import com.docotel.ikhsansyahrizal.doconewss.helper.EndlessOnScrollListener
-import com.docotel.ikhsansyahrizal.doconewss.helper.NetworkAttribute
+import com.docotel.ikhsansyahrizal.doconewss.helper.StateApi
+import com.docotel.ikhsansyahrizal.doconewss.networking.retrofit.ApiService
 import com.docotel.ikhsansyahrizal.doconewss.viewmodel.NewsViewModel
+import com.docotel.ikhsansyahrizal.doconewss.viewmodelfactory.NewsViewModelFactory
 import com.docotel.ikhsansyahrizal.first.networking.res.ArticlesItem
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), NewsAdapter.OnItemClickListener {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var newsAdapter: NewsAdapter
-    private val viewModel: NewsViewModel by viewModels()
+    private val viewModel: NewsViewModel by viewModels {
+        NewsViewModelFactory(ApiService)
+    }
     private var queryData = ""
 
     private val articleItemsArrayList = ArrayList<ArticlesItem>()
@@ -33,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        newsAdapter = NewsAdapter()
+        newsAdapter = NewsAdapter(this)
         binding.rvNews.adapter = newsAdapter
 
         val layoutManager = LinearLayoutManager(this)
@@ -41,20 +45,12 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.myToolbar)
 
-        observeLoading()
-
-        viewModel.newsData.observe(this) { newList ->
-            articleItemsArrayList.addAll(newList)
-            newsAdapter.setList(articleItemsArrayList.toMutableList())
-            binding.swipeRefreshLayout.isRefreshing = false
-
-        }
+        observeStatus()
 
         binding.rvNews.stopScroll()
         page = 1
         loadMore = false
         viewModel.loadNextPage("", page)
-        observeStatus()
 
         scrollData().let { newItemDetected ->
             binding.rvNews.addOnScrollListener(newItemDetected)
@@ -72,19 +68,41 @@ class MainActivity : AppCompatActivity() {
             binding.swipeRefreshLayout.isRefreshing = false
         }
 
-        newsAdapter.setOnItemClickListener(object : NewsAdapter.OnItemClickListener {
-            override fun onItemClick(article: ArticlesItem) {
-                val intent = Intent(this@MainActivity, DetailActivity::class.java).apply {
-                    val bundle = Bundle()
-                    bundle.putParcelable("ARTICLE_KEY", article)
-                    putExtras(bundle)
-                }
-                startActivity(intent)
-            }
-        })
-
     }
 
+    private fun observeStatus() {
+        viewModel.stateApi.observe(this) {
+            when(it) {
+                is StateApi.Error -> {
+                    binding.tvError.text = it.message
+                    binding.tvError.visibility = View.VISIBLE
+                }
+                StateApi.Loading -> {
+                    binding.progressbar.visibility = View.VISIBLE
+
+                }
+                StateApi.NotLoading -> {
+                    binding.progressbar.visibility = View.GONE
+                }
+                is StateApi.Success -> {
+                    articleItemsArrayList.addAll(it.data)
+                    newsAdapter.setList(articleItemsArrayList.toMutableList())
+                    binding.swipeRefreshLayout.isRefreshing = false
+                }
+            }
+
+        }
+    }
+
+    override fun onItemClick(article: ArticlesItem, position: Int) {
+        val intent = Intent(this@MainActivity, DetailActivity::class.java).apply {
+            val bundle = Bundle()
+            bundle.putParcelable("ARTICLE_KEY", article)
+            putExtras(bundle)
+            putExtra("index", position)
+        }
+        startActivity(intent)
+    }
 
     private fun scrollData(): EndlessOnScrollListener {
         return object : EndlessOnScrollListener() {
@@ -127,31 +145,9 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
-
-
-    private fun observeLoading() {
-        viewModel.isLoading.observe(this) { isLoading ->
-            if (isLoading) {
-                binding.progressbar.visibility = View.VISIBLE
-            } else {
-                binding.progressbar.visibility = View.GONE
-            }
-        }
-    }
-
-    private fun observeStatus() {
-        viewModel.errorLimit.observe(this) { errorLimit ->
-            if (errorLimit) {
-                binding.tvError.text = NetworkAttribute.errorMessage
-                binding.tvError.visibility = View.VISIBLE
-            } else {
-                binding.tvError.visibility = View.GONE
-            }
-        }
-    }
-
 
 }

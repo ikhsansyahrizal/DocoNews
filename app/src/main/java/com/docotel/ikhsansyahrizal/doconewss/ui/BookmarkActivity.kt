@@ -1,5 +1,6 @@
 package com.docotel.ikhsansyahrizal.doconewss.ui
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -8,20 +9,31 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.lifecycle.ViewModelProvider
+import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.docotel.ikhsansyahrizal.doconewss.local.bookmark.BookmarkManager
 import com.docotel.ikhsansyahrizal.doconewss.R
 import com.docotel.ikhsansyahrizal.doconewss.databinding.ActivityBookmarkBinding
+import com.docotel.ikhsansyahrizal.doconewss.helper.NetworkAttribute
 import com.docotel.ikhsansyahrizal.doconewss.viewmodel.BookmarkViewModel
 import com.docotel.ikhsansyahrizal.doconewss.viewmodelfactory.BookmarkViewModelFactory
 import com.docotel.ikhsansyahrizal.first.networking.res.ArticlesItem
 
-class BookmarkActivity : AppCompatActivity() {
+class BookmarkActivity : AppCompatActivity(), NewsAdapter.OnItemClickListener {
 
     private lateinit var binding: ActivityBookmarkBinding
     private lateinit var bookmarkadapter: NewsAdapter
-    private lateinit var viewModel: BookmarkViewModel
-    private lateinit var toast : Toast
+    private val viewModel: BookmarkViewModel by viewModels {
+        BookmarkViewModelFactory(
+            BookmarkManager(
+                applicationContext.getSharedPreferences(
+                    NetworkAttribute.PREFERENCE_NAME,
+                    Context.MODE_PRIVATE
+                )
+            )
+        )
+    }
+    private lateinit var toast: Toast
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,17 +41,14 @@ class BookmarkActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setSupportActionBar(binding.myToolbarBookmark)
-        toast = Toast.makeText(applicationContext,"", Toast.LENGTH_SHORT)
+        toast = Toast.makeText(applicationContext, "", Toast.LENGTH_SHORT)
         toast.view?.findViewById<ImageView>(android.R.id.icon)?.apply {
             setImageResource(R.drawable.baseline_delete_24)
             visibility = View.VISIBLE
         }
 
-        val viewModelFactory = BookmarkViewModelFactory(applicationContext)
-        viewModel = ViewModelProvider(this, viewModelFactory)[BookmarkViewModel::class.java]
-
         binding.rvNewsBookmark.layoutManager = LinearLayoutManager(this)
-        bookmarkadapter = NewsAdapter()
+        bookmarkadapter = NewsAdapter(this)
         binding.rvNewsBookmark.adapter = bookmarkadapter
 
 
@@ -56,17 +65,17 @@ class BookmarkActivity : AppCompatActivity() {
             binding.swipeRefreshLayout.isRefreshing = false
         }
 
-        bookmarkadapter.setOnItemClickListener(object : NewsAdapter.OnItemClickListener {
-            override fun onItemClick(article: ArticlesItem) {
-                val intent = Intent(this@BookmarkActivity, DetailActivity::class.java).apply {
-                    val bundle = Bundle()
-                    bundle.putParcelable("ARTICLE_KEY", article)
-                    putExtras(bundle)
-                }
-                startActivity(intent)
-            }
-        })
 
+    }
+
+    override fun onItemClick(article: ArticlesItem, position: Int) {
+        val intent = Intent(this@BookmarkActivity, DetailActivity::class.java).apply {
+            val bundle = Bundle()
+            bundle.putParcelable("ARTICLE_KEY", article)
+            putExtras(bundle)
+            putExtra("index", position)
+        }
+        startActivity(intent)
     }
 
 
@@ -81,6 +90,7 @@ class BookmarkActivity : AppCompatActivity() {
                 clearAllData()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }

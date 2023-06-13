@@ -1,5 +1,6 @@
 package com.docotel.ikhsansyahrizal.doconewss.ui
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
@@ -11,9 +12,11 @@ import android.text.style.ClickableSpan
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import androidx.lifecycle.ViewModelProvider
+import androidx.activity.viewModels
+import com.docotel.ikhsansyahrizal.doconewss.local.bookmark.BookmarkManager
 import com.docotel.ikhsansyahrizal.doconewss.R
 import com.docotel.ikhsansyahrizal.doconewss.databinding.ActivityDetailBinding
+import com.docotel.ikhsansyahrizal.doconewss.helper.NetworkAttribute
 import com.docotel.ikhsansyahrizal.doconewss.viewmodel.DetailViewModel
 import com.docotel.ikhsansyahrizal.doconewss.viewmodelfactory.DetailViewModelFactory
 import com.docotel.ikhsansyahrizal.first.networking.res.ArticlesItem
@@ -22,10 +25,20 @@ import com.squareup.picasso.Picasso
 class DetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDetailBinding
-    private lateinit var viewModel: DetailViewModel
+    private val viewModel: DetailViewModel by viewModels {
+        DetailViewModelFactory(
+            BookmarkManager(
+                applicationContext.getSharedPreferences(
+                    NetworkAttribute.PREFERENCE_NAME,
+                    Context.MODE_PRIVATE
+                )
+            )
+        )
+    }
     private var isBookmarked: Boolean = false
 
     private lateinit var articlesItem: ArticlesItem
+    private var pos = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,11 +47,9 @@ class DetailActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.myToolbarDetail)
 
-        val viewmodelFactory = DetailViewModelFactory(applicationContext)
-        viewModel = ViewModelProvider(this, viewmodelFactory)[DetailViewModel::class.java]
-
         val article = intent.getParcelableExtra<ArticlesItem?>("ARTICLE_KEY")
         articlesItem = intent.getParcelableExtra("ARTICLE_KEY")!!
+        pos = intent.getIntExtra("index", 0)
 
         binding.tvTitleDetail.text = article?.title
         binding.tvDescriptionDetail.text = article?.description
@@ -52,7 +63,7 @@ class DetailActivity : AppCompatActivity() {
         tvReadMore.movementMethod = LinkMovementMethod.getInstance()
 
         val url = article?.url.toString()
-        val linkText = "read more"
+        val linkText = NetworkAttribute.READ_MORE
 
         val linkSpan = SpannableString(linkText)
         linkSpan.setSpan(
@@ -64,7 +75,6 @@ class DetailActivity : AppCompatActivity() {
             }, 0, linkText.length, Spanned.SPAN_EXCLUSIVE_INCLUSIVE
         )
         tvReadMore.text = linkSpan
-
 
     }
 
@@ -81,7 +91,7 @@ class DetailActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        invalidateOptionsMenu()
+        invalidateOptionsMenu()
         return when (item.itemId) {
             R.id.add_bookmark -> {
                 toogledBookmark()
@@ -95,22 +105,19 @@ class DetailActivity : AppCompatActivity() {
     private fun toogledBookmark() {
         if (isBookmarked) {
             viewModel.removeBookmark(articlesItem)
+            isBookmarked = false
         } else {
             viewModel.addBookmark(articlesItem)
+            isBookmarked = true
         }
         isBookmarked = !isBookmarked
     }
 
     private fun updateBookmarkIcon(articlesItem: ArticlesItem) {
-        val bookmarkIcon = binding.myToolbarDetail.menu.findItem(R.id.add_bookmark)
         val listArticle = viewModel.getBookmarkedArticles()
-        if (listArticle.contains(articlesItem)) {
-            isBookmarked = true
-            bookmarkIcon?.setIcon(R.drawable.baseline_bookmark_added_24)
-        } else {
-            bookmarkIcon?.setIcon(R.drawable.baseline_bookmark_add_24)
-        }
+        isBookmarked = listArticle.contains(articlesItem)
         invalidateOptionsMenu()
-
     }
+
+
 }

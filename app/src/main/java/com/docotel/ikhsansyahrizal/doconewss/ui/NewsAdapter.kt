@@ -10,24 +10,20 @@ import com.docotel.ikhsansyahrizal.doconewss.helper.DIFFUTIL_ARTICLEITEM_CALLBAC
 import com.docotel.ikhsansyahrizal.first.networking.res.ArticlesItem
 import com.squareup.picasso.Picasso
 
-class NewsAdapter : RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
-
-    private lateinit var clickListener: OnItemClickListener
+class NewsAdapter(private val setOnItemClickListener: OnItemClickListener) : RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
 
     interface OnItemClickListener {
-        fun onItemClick(article: ArticlesItem)
+        fun onItemClick(article: ArticlesItem, position: Int)
     }
 
-    fun setOnItemClickListener(listener: OnItemClickListener) {
-        clickListener = listener
-    }
+
 
     private val differ = AsyncListDiffer(this, DIFFUTIL_ARTICLEITEM_CALLBACK)
 
     inner class NewsViewHolder(private val binding: NewsItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(data: ArticlesItem) {
+        fun bind(data: ArticlesItem, position: Int) {
             binding.tvTitle.text = data.title ?: ""
             binding.tvDesc.text = data.description ?: ""
             binding.tvAuthor.text = (data.author ?: "")
@@ -38,7 +34,7 @@ class NewsAdapter : RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
                 .into(binding.imgNews)
 
             binding.root.setOnClickListener {
-                clickListener.onItemClick(data)
+                setOnItemClickListener.onItemClick(data, position)
             }
         }
 
@@ -52,7 +48,7 @@ class NewsAdapter : RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
 
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
         val currentItem = differ.currentList[position]
-        holder.bind(currentItem)
+        holder.bind(currentItem, position)
 
     }
 

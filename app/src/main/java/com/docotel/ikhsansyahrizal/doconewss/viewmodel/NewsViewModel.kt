@@ -5,31 +5,26 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.docotel.ikhsansyahrizal.doconewss.helper.NetworkAttribute
+import com.docotel.ikhsansyahrizal.doconewss.helper.StateApi
 import com.docotel.ikhsansyahrizal.first.networking.res.ArticlesItem
-import com.docotel.ikhsansyahrizal.doconewss.networking.retrofit.ApiException
 import com.docotel.ikhsansyahrizal.doconewss.networking.retrofit.ApiService
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.lang.Exception
 
-class NewsViewModel() : ViewModel() {
-
-    private val apiService = ApiService
+class NewsViewModel(private val apiService: ApiService) : ViewModel() {
 
     private var isLastPage = false
-    var isLoading = MutableLiveData<Boolean>()
-    var errorLimit = MutableLiveData<Boolean>()
 
-    private val _newsData = MutableLiveData<List<ArticlesItem>>()
-    val newsData: LiveData<List<ArticlesItem>> = _newsData
+    private val _stateApi : MutableLiveData<StateApi<List<ArticlesItem>>> = MutableLiveData()
+    val stateApi: LiveData<StateApi<List<ArticlesItem>>> = _stateApi
 
     fun loadNextPage(query: String, currentPage: Int) {
         if (!isLastPage) {
-            isLoading.value = true
+            _stateApi.value = StateApi.Loading
             viewModelScope.launch {
-
                 try {
-                    delay(500)
-                    val response = if (query.isNullOrEmpty()) {
+                    val response = if (query.isEmpty()) {
                         apiService.getNews(
                             "us",
                             query,
@@ -48,15 +43,15 @@ class NewsViewModel() : ViewModel() {
 
                     if (response.isSuccessful) {
                         val newsList = response.body()?.articles ?: emptyList()
-                        _newsData.value = newsList
+                        _stateApi.value = StateApi.Success(newsList)
                     } else {
-                        errorLimit.value = true
-                        isLoading.value = false
+                        _stateApi.value = StateApi.Error(NetworkAttribute.errorMessage)
+                        _stateApi.value = StateApi.NotLoading
                     }
-                } catch (_: ApiException) {
-
+                } catch (e: Exception) {
+                    print(e)
                 }
-                isLoading.value = false
+                _stateApi.value = StateApi.NotLoading
             }
 
         }
