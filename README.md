@@ -2,7 +2,7 @@
 
 #Modul 1
 
-making and app using public data from newsapi.org, implement ViewModel and ViewModelFactory, EndlessRecylerView for paging, and ViewBinding.
+making an app using public data from newsapi.org, implement ViewModel and ViewModelFactory, EndlessRecylerView for paging, and ViewBinding.
 
 #Preview
 
